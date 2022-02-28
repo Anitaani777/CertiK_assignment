@@ -1,0 +1,640 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "51c5ffe6",
+   "metadata": {},
+   "source": [
+    "# <center> Backend / Infrastructure / SRE / Data platform Assignment"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e1c3b48c",
+   "metadata": {},
+   "source": [
+    "## Exercise -1 :  Finding the nonce."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "c28e7f0e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hashlib"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "a05adaf3",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "3\n",
+      "Start timestamp is %s 2022-02-28 06:42:38.717000\n",
+      "Q02IL1D1HPP3K5SWDIFL8IIH76QMLCVUPNVT3G2KWQW47ZC1OIPLIK3NYN9GMG4H3CVBOZMO0VHOY4WBVETLHGSZ877KVDWJUO1\n",
+      "Elapsed time is %s 2022-02-28 06:42:38.837540\n",
+      "000033ca05d8d3533ec4b0ef5052420523a34f79acd7806bb41a5a9d74e17687\n",
+      "60126\n"
+     ]
+    }
+   ],
+   "source": [
+    "import datetime\n",
+    "import hashlib\n",
+    "import random  \n",
+    "import string  \n",
+    "NONCE = 0\n",
+    "data = input()\n",
+    "n = len(data)\n",
+    "n\n",
+    "if n<=70:\n",
+    "  S= 100-n\n",
+    "\n",
+    "d = datetime.datetime.now()\n",
+    "print(\"Start timestamp is %s\",d)\n",
+    "ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = S))  \n",
+    "print(str(ran))\n",
+    "sample = data+ran\n",
+    "found =0\n",
+    "block =123  \n",
+    "if len(sample)==100:\n",
+    "    while found==0:\n",
+    "        z = str(NONCE)+sample\n",
+    "        newHash= hashlib.sha256(z.encode()).hexdigest()\n",
+    "        if newHash[:4]=='0000':\n",
+    "            found=1\n",
+    "        NONCE+=1\n",
+    "d2= datetime.datetime.now()\n",
+    "print(\"Elapsed time is %s\", d2)\n",
+    "print(newHash)\n",
+    "print(NONCE)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9c5cdfe5",
+   "metadata": {},
+   "source": [
+    "#### Implementation of code: \n",
+    "* I kept passing block through the hashing function until I find the Nonce that gives me a hash which starts with \"0000\". It takes more time to find the hash that starts with more zeroes and that can be found by adding timestamp as shown below."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "7bb05ed9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "csdfd\n",
+      "Start timestamp is %s 2022-02-28 06:43:17.662864\n",
+      "01062BA19HIKRSX3FVF71HWBO3SN4NY1MO997WRTFXUGYO7VQEDB34UC51KWH8HIN8UDVEA6B8WN1TVUF1NTNUFNKP3RMO8\n",
+      "Elapsed time is %s 2022-02-28 06:43:31.038357\n",
+      "000000fc7a480de51a2cd90787dbc03664150d821fbe5611f3ab7d39401a8d20\n",
+      "10499888\n"
+     ]
+    }
+   ],
+   "source": [
+    "import datetime\n",
+    "import hashlib\n",
+    "import random  \n",
+    "import string  \n",
+    "NONCE = 0\n",
+    "data = input()\n",
+    "n = len(data)\n",
+    "n\n",
+    "if n<=70:\n",
+    "  S= 100-n\n",
+    "\n",
+    "d = datetime.datetime.now()\n",
+    "print(\"Start timestamp is %s\",d)\n",
+    "ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k = S))  \n",
+    "print(str(ran))\n",
+    "sample = data+ran\n",
+    "found =0\n",
+    "block =123  \n",
+    "if len(sample)==100:\n",
+    "    while found==0:\n",
+    "        z = str(NONCE)+sample\n",
+    "        newHash= hashlib.sha256(z.encode()).hexdigest()\n",
+    "        if newHash[:6]=='000000':\n",
+    "            found=1\n",
+    "        NONCE+=1\n",
+    "d2= datetime.datetime.now()\n",
+    "print(\"Elapsed time is %s\", d2)\n",
+    "print(newHash)\n",
+    "print(NONCE)\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8c7d753d",
+   "metadata": {},
+   "source": [
+    "\n",
+    "#### As we can see, the time to search increases when the number of zeroes increases"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "651cf3bd",
+   "metadata": {},
+   "source": [
+    "## Exercise -2 :  Constructing and verifying a blockchain"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "67de8282",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[{'nonce': 'PNCNXDRKONIUIYFGMNFJHUZGCBZKAVHJDRNDJZFQXYMNQXXXFAOUBBKEFLMQDCLNJCIITBHDJDIFOWQKNFYNPDROCVGHBMRYZBA', 'miner': 0}, {'nonce': 'JWPVJAHXWFGNGKPAJCXUWTESBVJFGWYCYNR', 'miner': 0}, {'nonce': 'FJDDCQBYLFRZZQANSSHOSHHPUUWOHPEOOHJ', 'miner': 0}, {'nonce': 'SVVBGEFUVHYGHIVCCYXUTWTUNCZLYPOYECB', 'miner': 0}, {'nonce': 'KYLIQSQOEKDIQUVELVLTZBWQVFKPYHQXQKA', 'miner': 0}, {'nonce': 'BXAUAISFXUJXJCHYRYKOKPOZZUIYCUCBZDP', 'miner': 0}, {'nonce': 'GGWJSDMUELSECCHNPNPJAZFRRFMDXNUOLWC', 'miner': 0}, {'nonce': 'WZEFZXZHFEYNDCYOREYOHKFBYNBXQCRFOCS', 'miner': 0}, {'nonce': 'EHKXPOMHYFDCAPDXKJPLFSRUCCLTUWHSFYM', 'miner': 0}, {'nonce': 'OXOYOSTXKGNFYQHYKUKSWDKMCWCJFTOYXRA', 'miner': 0}]\n",
+      "Blockchain verified\n"
+     ]
+    }
+   ],
+   "source": [
+    "import datetime\n",
+    " \n",
+    "import hashlib\n",
+    "import json\n",
+    "import math\n",
+    "from random import random\n",
+    "\n",
+    "\n",
+    "\n",
+    "class Blockchain:\n",
+    "   \n",
+    "    \n",
+    "    def __init__(self):\n",
+    "        self.chain = []\n",
+    "    \n",
+    "    def create_block(self):\n",
+    "        block = {'nonce': len(self.chain) + 1,\n",
+    "                 'miner': 0,\n",
+    "                 }\n",
+    "        self.chain.append(block)\n",
+    "        return block\n",
+    "    \n",
+    "    def makenonce(self,length):\n",
+    "        result           = \"\";\n",
+    "        characters       = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n",
+    "        for i in range(length):\n",
+    "            result += characters[math.floor(random() * len(characters))];\n",
+    "\n",
+    "        return result\n",
+    "\n",
+    " \n",
+    "\n",
+    "    def mine_block(self,isGenesis):\n",
+    "        Found = False\n",
+    "        miner =0\n",
+    "        if isGenesis:\n",
+    "            while Found == False:\n",
+    "                nonce = self.makenonce(99)  ## The genesis block’s nonce is 99 in length \n",
+    "                inputhash = str(nonce) + str(miner)\n",
+    "                hashval = hashlib.sha256(inputhash.encode()).hexdigest()\n",
+    "                if hashval[:4] == \"0000\":\n",
+    "                    Found = True\n",
+    "        else:\n",
+    "            while Found == False:\n",
+    "                nonce = self.makenonce(35) ##  other blocks’ nonces are 35 in length.\n",
+    "                inputhash = str(nonce) + str(miner) + self.chain[-1]['hashval']\n",
+    "                hashval = hashlib.sha256(inputhash.encode()).hexdigest()\n",
+    "                if hashval[:4] == \"0000\":\n",
+    "                    Found = True\n",
+    "\n",
+    "        \n",
+    "        response = {'nonce': nonce,\n",
+    "                    'miner':miner,\n",
+    "                    'hashval': hashval}\n",
+    "            \n",
+    "        self.chain.append(response)\n",
+    "    \n",
+    "        return response\n",
+    " \n",
+    "\n",
+    "\n",
+    "blockchain = Blockchain()\n",
+    "\n",
+    "chain = []\n",
+    "\n",
+    "blockchain.mine_block(True)    \n",
+    "\n",
+    "for i in range(0,9):\n",
+    "    blockchain.mine_block(False)\n",
+    "\n",
+    "    \n",
+    "#Print blockchain blocks\n",
+    "for i in range(0,10):\n",
+    "    chain.append({'nonce': blockchain.chain[i]['nonce'],\n",
+    "              'miner':blockchain.chain[i]['miner'],})\n",
+    "\n",
+    "print(chain)\n",
+    "    \n",
+    "    \n",
+    "#Verify Blockchain\n",
+    "def verify():\n",
+    "    for i in range(0,10):\n",
+    "        if not blockchain.chain[i]['hashval'][:4] == \"0000\":\n",
+    "            print(\"Block invalid\")\n",
+    "print(\"Blockchain verified\")\n",
+    "\n",
+    "verify()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d89a5b4f",
+   "metadata": {},
+   "source": [
+    "#### Implementation of Code:\n",
+    "* A block chain is constructed by using the create_block function. The make_nonce function generates a random string which is used by the mine_block to generate the nonce in such a way that the first 4 places are filled with 0000. To achieve this padding, SHA256 is used to hash the generated nonce."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5e6807c8",
+   "metadata": {},
+   "source": [
+    "## Exercise-3: Multithreading"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "19c785ce",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Enter value between 2 and 10[2,10)5\n",
+      "Thread - 0: [0] --time: Mon Feb 28 06:44:02 2022\n",
+      "Thread - 1: [1] --time: Mon Feb 28 06:44:02 2022\n",
+      "Thread - 2: [2] --time: Mon Feb 28 06:44:02 2022\n",
+      "Thread - 3: [3] --time: Mon Feb 28 06:44:02 2022\n",
+      "Thread - 4: [4] --time: Mon Feb 28 06:44:02 2022\n",
+      "4\n"
+     ]
+    }
+   ],
+   "source": [
+    "import threading\n",
+    "import time\n",
+    "from datetime import datetime\n",
+    "\n",
+    "debug_string = \"Thread - {0}: [{0}] --time: {time}\"\n",
+    "def say(i):\n",
+    "    dateTimeObj = datetime.now()\n",
+    "    timestampStr = dateTimeObj.strftime(\"%a %b %d %H:%M:%S %Y\")\n",
+    "    print(debug_string.format(i, time=timestampStr))\n",
+    "\n",
+    "n = int(input((\"Enter value between 2 and 10[2,10)\")))\n",
+    "\n",
+    "thread_traker = []\n",
+    "if n>=2 and n<10:\n",
+    "    for i in range(0, n):\n",
+    "        thread = threading.Thread(target=say, args=(i,))\n",
+    "        thread.start()\n",
+    "        thread_traker.append(thread)\n",
+    "        thread.join()\n",
+    "\n",
+    "# Threads will automatically get stopped, but if you want to stop one of it specifically\n",
+    "# if you want to kill all run it in a loop\n",
+    "kill = int(input())\n",
+    "stop_threads = True\n",
+    "thread_traker[kill - 1].join()\n",
+    "# or use sys.exit() to kill all other threads run by programs"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fca6c280",
+   "metadata": {},
+   "source": [
+    "#### Implementation of Code:\n",
+    "* A thread-traker list is created to append all the threads to the list. N is the number of threads we want the program to implement. If condition is given such that the n value lies between 2 and 10. The thread calls the say method which prints the required output"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "81e701e4",
+   "metadata": {},
+   "source": [
+    "## Exercise- 4 : Inter-thread communication"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "768ff5c9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "5\n",
+      "Thread 0 sending message PQWRAVEZVM to all other threads\n",
+      "Thread 1 sending message MEMWFQZOSG to all other threads\n",
+      "\n",
+      "\n",
+      "Thread 2 sending message UTHFRYOYKC to all other threads\n",
+      "\n",
+      "Thread 3 sending message SSHUWLJSQL to all other threads\n",
+      "\n",
+      "Thread 4 sending message QMFSUUQSIL to all other threads\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "from queue import Queue\n",
+    "import threading\n",
+    "import random\n",
+    "import string\n",
+    "import time\n",
+    "\n",
+    "def produce_and_consume(i,hmap):\n",
+    "\n",
+    "    #Produce the data and push it to the queues of all threads\n",
+    "    length =10\n",
+    "    letters = string.ascii_uppercase\n",
+    "    data = ''.join(random.choice(letters) for i in range(length))\n",
+    "    # out_q.put(data)\n",
+    "    for k in hmap.keys():\n",
+    "        if k!=i:\n",
+    "            hmap[k].put(data)\n",
+    "    print(\"Thread {0} sending message {1} to all other threads\\n\".format(i, data) )\n",
+    "\n",
+    "    time.sleep(5)\n",
+    "\n",
+    "    #consume the data\n",
+    "    while True:\n",
+    "        while hmap[i].qsize() > 0:\n",
+    "            print(\"Thread{0} received a message {1}\\n\".format(i,hmap[i].get()))\n",
+    "        time.sleep(5)\n",
+    "\n",
+    "hmap = {}\n",
+    "n = int(input())\n",
+    "if n>=2 and n<6:\n",
+    "    for i in range(0,n):\n",
+    "        hmap[i] = Queue()\n",
+    "\n",
+    "    for i in range(0, n):\n",
+    "        thread = threading.Thread(target=produce_and_consume, args=(i,hmap))\n",
+    "        thread.start()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "574af7c4",
+   "metadata": {},
+   "source": [
+    "#### Implementation of Code:\n",
+    "* A hash map makes use of a hash function to compute an index with a key into an array of buckets or slots. Its value is mapped to the bucket with the corresponding index. Hmap is used to send the threads accordingly to consume and produce methods. The produce and consume method is used to send the messages from one thread thread and receive messages by all other threads."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4cd2980e",
+   "metadata": {},
+   "source": [
+    "## Exercise - 5:  Decentralizing the blockchain"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "id": "35d41b3c",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "3\n",
+      "[]\n",
+      "{'nonce': 'FSPKLFESLKKYWIBMFFNHBAXEWLWVECUWFWSMEJTZTLGKPQUWLWXIVRQQHLNINDMOJSOTEUEACSQUTJVVMBHDMDOXGYGJFIBSKZA', 'miner': 2, 'hasval': '0000362f55f1063301aba9542ead143c7a2d064e0ee81f3e6dddae7f89b48ad8'}\n",
+      "{'nonce': 'ILPTNRNKJRUOSUQUDTNKDHUJVBSEPHQHWVJYKWKSIYSSQHCCXAFHHOPQFWTVBWFPIBEBEBZESVUZJWFHCQLEZGAUNHQCSNJZVFK', 'miner': 0, 'hasval': '00002074cbe9038474206aba225d6f334d05163753449ba828585dc1cf07b7c6'}\n",
+      "{'nonce': 'RZRPDAQECXYKTZWLZHYRNAJEDWQEAPDJGITPLRWWEEKINNNUPJAGSMHCGQBELCLGRADGEOJFSZDYUAVMDBNIJAZZAXLMDTABURG', 'miner': 1, 'hasval': '00002809560d2cb672c93286b963a2057537201cf35ad42da68d8ae08918f96d'}\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Exception in thread Thread-204:\n",
+      "Traceback (most recent call last):\n",
+      "  File \"/Users/anitateladevalapalli/opt/anaconda3/lib/python3.9/threading.py\", line 973, in _bootstrap_inner\n",
+      "    self.run()\n",
+      "  File \"/Users/anitateladevalapalli/opt/anaconda3/lib/python3.9/threading.py\", line 910, in run\n",
+      "    self._target(*self._args, **self._kwargs)\n",
+      "  File \"/var/folders/6f/c2b7vdpx247cstzj573kd1k40000gn/T/ipykernel_71572/1254715824.py\", line 103, in produce_and_consume\n",
+      "  File \"/var/folders/6f/c2b7vdpx247cstzj573kd1k40000gn/T/ipykernel_71572/1254715824.py\", line 82, in verify\n",
+      "TypeError: 'Queue' object is not subscriptable\n",
+      "Exception in thread Thread-202:\n",
+      "Traceback (most recent call last):\n",
+      "  File \"/Users/anitateladevalapalli/opt/anaconda3/lib/python3.9/threading.py\", line 973, in _bootstrap_inner\n",
+      "    self.run()\n",
+      "  File \"/Users/anitateladevalapalli/opt/anaconda3/lib/python3.9/threading.py\", line 910, in run\n",
+      "    self._target(*self._args, **self._kwargs)\n",
+      "  File \"/var/folders/6f/c2b7vdpx247cstzj573kd1k40000gn/T/ipykernel_71572/1254715824.py\", line 103, in produce_and_consume\n",
+      "  File \"/var/folders/6f/c2b7vdpx247cstzj573kd1k40000gn/T/ipykernel_71572/1254715824.py\", line 82, in verify\n",
+      "TypeError: 'Queue' object is not subscriptable\n",
+      "Exception in thread Thread-203:\n",
+      "Traceback (most recent call last):\n",
+      "  File \"/Users/anitateladevalapalli/opt/anaconda3/lib/python3.9/threading.py\", line 973, in _bootstrap_inner\n",
+      "    self.run()\n",
+      "  File \"/Users/anitateladevalapalli/opt/anaconda3/lib/python3.9/threading.py\", line 910, in run\n",
+      "    self._target(*self._args, **self._kwargs)\n",
+      "  File \"/var/folders/6f/c2b7vdpx247cstzj573kd1k40000gn/T/ipykernel_71572/1254715824.py\", line 103, in produce_and_consume\n",
+      "  File \"/var/folders/6f/c2b7vdpx247cstzj573kd1k40000gn/T/ipykernel_71572/1254715824.py\", line 82, in verify\n",
+      "TypeError: 'Queue' object is not subscriptable\n"
+     ]
+    }
+   ],
+   "source": [
+    "import datetime\n",
+    " \n",
+    "import hashlib\n",
+    "import json\n",
+    "import math\n",
+    "from random import random\n",
+    "from queue import Queue\n",
+    "import threading\n",
+    "import random\n",
+    "import string\n",
+    "import time\n",
+    "\n",
+    "\n",
+    "\n",
+    "class Blockchain:\n",
+    "   \n",
+    "    \n",
+    "    def init(self):\n",
+    "        self.chain = []\n",
+    "    \n",
+    "    def create_block(self):\n",
+    "        block = {'nonce': len(self.chain) + 1,\n",
+    "                 'miner': 0,\n",
+    "                 }\n",
+    "        self.chain.append(block)\n",
+    "        return block\n",
+    "    \n",
+    "    def makenonce(self,length):\n",
+    "        result           = \"\";\n",
+    "        characters       = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n",
+    "        for i in range(length):\n",
+    "            result += characters[int(math.floor(random.random() * len(characters)))];\n",
+    "\n",
+    "        return result\n",
+    "\n",
+    " \n",
+    "\n",
+    "    def mine_block(self,isGenesis,chain,i):\n",
+    "        Found = False\n",
+    "\n",
+    "        miner = i\n",
+    "        if isGenesis:\n",
+    "            while Found == False:\n",
+    "                nonce = self.makenonce(99)\n",
+    "                inputhash = str(nonce) + str(miner)\n",
+    "                hashval = hashlib.sha256(inputhash.encode()).hexdigest()\n",
+    "                if hashval[:4] == \"0000\":\n",
+    "                    Found = True\n",
+    "        else:\n",
+    "            while Found == False:\n",
+    "                nonce = self.makenonce(35)\n",
+    "                inputhash = str(nonce) + str(miner) + self.chain[-1]['hashval']\n",
+    "                hashval = hashlib.sha256(inputhash.encode()).hexdigest()\n",
+    "                if hashval[:4] == \"0000\":\n",
+    "                    Found = True\n",
+    "\n",
+    "        \n",
+    "        response = {'nonce': nonce,\n",
+    "                    'miner':miner,\n",
+    "                   'hasval':hashval}\n",
+    "        \n",
+    "        print (response)\n",
+    "        chain.append(response)\n",
+    "       \n",
+    "    \n",
+    "        return response\n",
+    "\n",
+    "    \n",
+    "\n",
+    " \n",
+    "# #Verify Blockchain\n",
+    "# def verify():\n",
+    "#     for i in range(0,10):\n",
+    "#         if not blockchain.chain[i]['hashval'][:4] == \"0000\":\n",
+    "#             print(\"Block invalid\")\n",
+    "            \n",
+    "\n",
+    "             \n",
+    "#Verify Blockchain\n",
+    "def verify(chain):\n",
+    "    for i in range(0,10):\n",
+    "        if not chain[i]['hashval'][:4] == \"0000\":\n",
+    "            print(\"Block invalid\")\n",
+    "    print(\"Blockchain is verified\")\n",
+    "\n",
+    "\n",
+    "def produce_and_consume(blockchain,chain,hmap,i):\n",
+    "    #Produce the data and push it to the queues of all threads\n",
+    "    \n",
+    "    response = blockchain.mine_block(True,chain,i)\n",
+    "    \n",
+    "    for k in hmap.keys():\n",
+    "        if k!=i:\n",
+    "            chain.append(response);\n",
+    "            hmap[k].put(chain)\n",
+    "\n",
+    "    time.sleep(5)\n",
+    "\n",
+    "    #consume the data\n",
+    "    while True:\n",
+    "        while hmap[i].qsize() > 0:\n",
+    "            incomingChain =  hmap[i]\n",
+    "            if verify(incomingChain) and len(incomingChain) > len(chain):\n",
+    "                chain = incomingChain\n",
+    "            \n",
+    "                \n",
+    "        time.sleep(5)\n",
+    "\n",
+    "\n",
+    "\n",
+    "blockchain = Blockchain()\n",
+    "chain = []\n",
+    "hmap = {}\n",
+    "n = int(input())\n",
+    "for i in range(0,n):\n",
+    "    hmap[i] = Queue()\n",
+    "    \n",
+    "    \n",
+    "for i in range(0,n):\n",
+    "    thread = threading.Thread(target=produce_and_consume, args=(blockchain,chain,hmap,i))\n",
+    "    thread.start()\n",
+    "\n",
+    "print(chain)\n",
+    "# while (len(chain) <= 10):\n",
+    "#     newBlock = blockchain.mine_block(True)\n",
+    "#     if newBlock is not None:\n",
+    "#         chain.append(newBlock)\n",
+    "#         #send chain to all other threads\n",
+    "#     thread = threading.Thread(target=blockchain.mine_block(True), args=(chain,hmap))\n",
+    "#     thread.start()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "73175d87",
+   "metadata": {},
+   "source": [
+    "### Implementation of code: \n",
+    "* Started n threads initially and each of the thread mines the block in the producer function and in consumer each of the thread gets the updated chain and the verify function is called."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
